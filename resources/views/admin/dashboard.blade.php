@@ -68,10 +68,14 @@
                     <p class="text-xs font-semibold text-gray-700">Upload Foto</p>
                 </a>
                 
-                <a href="{{ route('admin.users.create') }}" class="border border-gray-200 rounded-lg p-4 text-center hover:bg-coffee-light hover:border-coffee-primary transition group cursor-pointer">
-                    <i class="fa-solid fa-user-plus text-orange-500 text-2xl mb-3 group-hover:scale-110 transition"></i>
-                    <p class="text-xs font-semibold text-gray-700">Tambah Admin</p>
-                </a>
+                @auth
+                    @if(auth()->user()->role === 'superadmin')
+                        <a href="{{ route('admin.users.create') }}" class="border border-gray-200 rounded-lg p-4 text-center hover:bg-coffee-light hover:border-coffee-primary transition group cursor-pointer">
+                            <i class="fa-solid fa-user-plus text-orange-500 text-2xl mb-3 group-hover:scale-110 transition"></i>
+                            <p class="text-xs font-semibold text-gray-700">Tambah Admin</p>
+                        </a>
+                    @endif
+                @endauth
                 
                 <a href="{{ route('home') }}" target="_blank" class="border border-gray-200 rounded-lg p-4 text-center hover:bg-coffee-light hover:border-coffee-primary transition group cursor-pointer">
                     <i class="fa-solid fa-globe text-gray-400 text-2xl mb-3 group-hover:scale-110 transition"></i>

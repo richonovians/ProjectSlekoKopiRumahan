@@ -14,22 +14,28 @@
             <span class="ml-3 font-medium text-sm">Dashboard</span>
         </a>
 
-        <a href="{{ route('admin.menu') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
-            <i class="fa-solid fa-mug-hot w-6 text-center group-hover:text-white transition-colors"></i>
+        <a href="{{ route('admin.menu') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.menu*') ? 'bg-[#005bb5] text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }} rounded-lg transition-colors group">
+            <i class="fa-solid fa-mug-hot w-6 text-center {{ request()->routeIs('admin.menu*') ? '' : 'group-hover:text-white transition-colors' }}"></i>
             <span class="ml-3 font-medium text-sm">Kelola Menu</span>
         </a>
 
-        <a href="{{ route('admin.gallery') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
-            <i class="fa-solid fa-images w-6 text-center group-hover:text-white transition-colors"></i>
+        <a href="{{ route('admin.gallery') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.gallery*') ? 'bg-[#005bb5] text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }} rounded-lg transition-colors group">
+            <i class="fa-solid fa-images w-6 text-center {{ request()->routeIs('admin.gallery*') ? '' : 'group-hover:text-white transition-colors' }}"></i>
             <span class="ml-3 font-medium text-sm">Kelola Gallery</span>
         </a>
 
-        <p class="px-4 text-[10px] font-bold tracking-wider text-gray-400 uppercase mt-6 mb-2">Administration</p>
+        @auth
+            @if(auth()->user()->role === 'superadmin')
+                
+                <p class="px-4 text-[10px] font-bold tracking-wider text-gray-400 uppercase mt-6 mb-2">Administration</p>
 
-        <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
-            <i class="fa-solid fa-user-shield w-6 text-center group-hover:text-white transition-colors"></i>
-            <span class="ml-3 font-medium text-sm">Kelola Admin</span>
-        </a>
+                <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('admin.users*') ? 'bg-[#005bb5] text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }} rounded-lg transition-colors group">
+                    <i class="fa-solid fa-user-shield w-6 text-center {{ request()->routeIs('admin.users*') ? '' : 'group-hover:text-white transition-colors' }}"></i>
+                    <span class="ml-3 font-medium text-sm">Kelola Admin</span>
+                </a>
+                
+            @endif
+        @endauth
         
         {{-- <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
             <i class="fa-solid fa-gear w-6 text-center group-hover:text-white transition-colors"></i>
@@ -38,7 +44,7 @@
     </nav>
 
     <div class="p-4 border-t border-white/10">
-        <form method="POST" action="#">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full flex items-center px-4 py-3 text-red-300 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors group">
                 <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
