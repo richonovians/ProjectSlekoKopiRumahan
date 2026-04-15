@@ -3,7 +3,7 @@
         
         <a href="{{ route('home') }}" class="flex flex-col items-center font-['Rajdhani'] text-[#023A73] hover:opacity-90 transition duration-300 z-30">
             <span class="text-4xl md:text-[2.5rem] font-bold leading-[0.8] tracking-wide">sleko</span>
-            <span class="text-[10px] md:text-[11px] font-medium tracking-[0.18em] -mt-1">kopi rumahan</span>
+            <span class="text-[10px] md:text-[11px] font-medium tracking-[0.13em] -mt-1">kopi rumahan</span>
         </a>
 
         <ul class="hidden md:flex space-x-8 text-sm items-center">

@@ -1,8 +1,8 @@
-<aside id="admin-sidebar" class="w-64 bg-coffee-dark text-white flex flex-col h-screen fixed md:relative z-40 inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex-shrink-0">
+<aside id="admin-sidebar" class="w-64 bg-coffee-dark text-white flex flex-col h-[100dvh] fixed md:relative z-40 inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex-shrink-0">
     <div class="h-20 flex items-center justify-center border-b border-white/10 mt-4 pb-4">
         <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center font-['Rajdhani'] hover:opacity-90 transition duration-300">
             <span class="text-4xl font-bold leading-[0.8] tracking-wide text-white">sleko</span>
-            <span class="text-[10px] font-medium tracking-[0.18em] -mt-1 text-gray-300">kopi rumahan</span>
+            <span class="text-[10px] font-medium tracking-[0.14em] -mt-0.5 text-gray-300">kopi rumahan</span>
         </a>
     </div>
 
@@ -37,13 +37,9 @@
             @endif
         @endauth
         
-        {{-- <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors group">
-            <i class="fa-solid fa-gear w-6 text-center group-hover:text-white transition-colors"></i>
-            <span class="ml-3 font-medium text-sm">Pengaturan Web</span>
-        </a> --}}
     </nav>
 
-    <div class="p-4 border-t border-white/10">
+    <div class="p-4 pb-8 md:pb-4 border-t border-white/10 bg-coffee-dark">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full flex items-center px-4 py-3 text-red-300 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors group">

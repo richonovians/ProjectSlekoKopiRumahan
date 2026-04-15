@@ -30,9 +30,11 @@
             <div class="absolute inset-0 bg-black/30 z-10"></div>
             <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1000&q=80" alt="Coffee Setup" class="absolute inset-0 w-full h-full object-cover">
             
-            <div class="relative z-20 text-center text-white px-12">
-                <h2 class="font-['Rajdhani'] text-6xl font-bold leading-none mb-2">sleko</h2>
-                <p class="tracking-[0.3em] text-sm uppercase mb-8 opacity-90">kopi rumahan</p>
+            <div class="relative z-20 flex flex-col items-center text-center text-white px-12">
+                <h2 class="font-['Rajdhani'] text-7xl lg:text-8xl font-bold leading-[0.8] tracking-tight">sleko</h2>
+                
+                <p class="font-['Rajdhani'] font-medium tracking-[0.4em] text-[12px] lg:text-[14px] -mt-3 ml-2 mb-8 opacity-90">kopi rumahan</p>
+                
                 <p class="font-light text-lg opacity-80 max-w-md mx-auto">Awali harimu dengan semangat baru dan secangkir inspirasi dari biji kopi pilihan.</p>
             </div>
         </div>
@@ -40,9 +42,9 @@
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12">
             <div class="w-full max-w-md">
                 
-                <div class="lg:hidden text-center mb-10">
-                    <h2 class="font-['Rajdhani'] text-5xl font-bold text-coffee-dark leading-none">sleko</h2>
-                    <p class="tracking-[0.2em] text-[10px] uppercase text-gray-500 font-semibold mt-1">kopi rumahan</p>
+                <div class="lg:hidden text-center mb-10 flex flex-col items-center">
+                    <h2 class="font-['Rajdhani'] text-7xl font-bold text-coffee-dark leading-[0.8] tracking-tight">sleko</h2>
+                    <p class="font-['Rajdhani'] font-medium tracking-[0.4em] text-[12px] text-gray-500 mt-0.1 ml-1 opacity-90">kopi rumahan</p>
                 </div>
 
                 <div class="mb-10 text-center lg:text-left">

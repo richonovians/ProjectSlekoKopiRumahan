@@ -56,50 +56,36 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="text-center flex flex-col items-center group">
-                <div class="w-full h-48 mb-4 overflow-hidden rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1572119865084-43c285814d63?auto=format&fit=crop&w=400&q=80" alt="Espresso" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="font-serif text-xl font-bold text-coffee-dark mb-2">Espresso Masterclass</h3>
-                <p class="text-[10px] text-gray-500 mb-4 px-2 line-clamp-2">Kopi pekat dengan crema yang sempurna untuk mengawali hari Anda.</p>
-                <a href="{{ route('menu') }}" class="w-full bg-coffee-dark hover:bg-[#5881c8] text-white text-xs font-semibold py-2.5 rounded-lg transition text-center block">
-                    Lihat Menu Lengkap
-                </a>
-            </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            
+            @forelse($featuredMenus as $menu)
+            <div class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] text-center flex flex-col items-center group">
 
-            <div class="text-center flex flex-col items-center group">
                 <div class="w-full h-48 mb-4 overflow-hidden rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80" alt="Iced" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <img src="{{ asset('storage/' . $menu->gambar) }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <h3 class="font-serif text-xl font-bold text-coffee-dark mb-2">Iced Favorites</h3>
-                <p class="text-[10px] text-gray-500 mb-4 px-2 line-clamp-2">Kesegaran kopi dingin berpadu dengan susu premium yang lembut.</p>
-                <a href="{{ route('menu') }}" class="w-full bg-coffee-dark hover:bg-[#5881c8] text-white text-xs font-semibold py-2.5 rounded-lg transition text-center block">
-                    Lihat Menu Lengkap
-                </a>
-            </div>
 
-            <div class="text-center flex flex-col items-center group">
-                <div class="w-full h-48 mb-4 overflow-hidden rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80" alt="Latte" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="font-serif text-xl font-bold text-coffee-dark mb-2">Coffee Favorites</h3>
-                <p class="text-[10px] text-gray-500 mb-4 px-2 line-clamp-2">Pilihan klasik yang tidak pernah salah, dinikmati selagi hangat.</p>
-                <a href="{{ route('menu') }}" class="w-full bg-coffee-dark hover:bg-[#5881c8] text-white text-xs font-semibold py-2.5 rounded-lg transition text-center block">
-                    Lihat Menu Lengkap
-                </a>
-            </div>
+                <h3 class="font-serif text-xl font-bold text-coffee-dark mb-2">
+                    {{ $menu->nama_menu }}
+                </h3>
 
-            <div class="text-center flex flex-col items-center group">
-                <div class="w-full h-48 mb-4 overflow-hidden rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80" alt="Organic" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="font-serif text-xl font-bold text-coffee-dark mb-2">Organic Beans</h3>
-                <p class="text-[10px] text-gray-500 mb-4 px-2 line-clamp-2">Biji kopi organik murni yang diproses secara alami dan ramah lingkungan.</p>
-                <a href="{{ route('menu') }}" class="w-full bg-coffee-dark hover:bg-[#5881c8] text-white text-xs font-semibold py-2.5 rounded-lg transition text-center block">
+                <p class="text-[10px] text-gray-500 mb-4 px-2 line-clamp-2">
+                    {{ $menu->deskripsi }}
+                </p>
+
+                <a href="{{ route('menu') }}"
+                class="w-full bg-coffee-dark hover:bg-[#5881c8] text-white text-xs font-semibold py-2.5 rounded-lg mt-auto inline-block">
                     Lihat Menu Lengkap
                 </a>
+
             </div>
+            @empty
+                <p class="w-full text-center text-gray-500">
+                    Belum ada menu unggulan
+                </p>
+            @endforelse
+
         </div>
     </section>
 

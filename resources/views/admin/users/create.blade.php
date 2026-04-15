@@ -11,7 +11,7 @@
         </a>
     </div>
 
-    <form action="#" method="POST">
+    <form action="{{ route('admin.users.store') }}" method="POST">
         @csrf
         
         <div class="flex flex-col lg:flex-row gap-6">
@@ -23,13 +23,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                         <div>
                             <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
-                            <input type="text" id="name" name="name" placeholder="Nama admin baru" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                            <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="Nama admin baru" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                            @error('name') <span class="text-[10px] text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Alamat Email <span class="text-red-500">*</span></label>
-                            <input type="email" id="email" name="email" placeholder="contoh@sleko.com" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="contoh@sleko.com" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                            @error('email') <span class="text-[10px] text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="telepon" class="block text-sm font-semibold text-gray-700 mb-2">Nomor Telepon</label>
+                        <input type="text" id="telepon" name="telepon" value="{{ old('telepon') }}" placeholder="08xxxxxxxxxx" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition">
+                        @error('telepon') <span class="text-[10px] text-red-500 mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2">
@@ -37,10 +45,8 @@
                             <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <input type="password" id="password" name="password" placeholder="••••••••" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
-                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-coffee-primary transition">
-                                    <i class="fa-solid fa-eye text-xs"></i>
-                                </button>
                             </div>
+                            @error('password') <span class="text-[10px] text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -48,7 +54,7 @@
                             <input type="password" id="password_confirmation" name="password_confirmation" placeholder="••••••••" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
                         </div>
                     </div>
-                    <p class="text-[10px] text-gray-400">Gunakan minimal 8 karakter dengan kombinasi huruf dan angka.</p>
+                    <p class="text-[10px] text-gray-400">Gunakan minimal 8 karakter.</p>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
@@ -73,6 +79,7 @@
                             </div>
                         </label>
                     </div>
+                    @error('role') <span class="text-[10px] text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 
@@ -88,18 +95,9 @@
                                 <span class="text-[10px] text-gray-400">Admin bisa langsung login</span>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="status" value="active" class="sr-only peer" checked>
+                                <input type="checkbox" name="status" value="1" class="sr-only peer" checked>
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-coffee-primary"></div>
                             </label>
-                        </div>
-
-                        <div class="bg-blue-50 border-l-4 border-coffee-primary p-3 rounded-r-lg">
-                            <div class="flex">
-                                <i class="fa-solid fa-circle-info text-coffee-primary mt-0.5 mr-3 text-sm"></i>
-                                <p class="text-[10px] text-blue-800 leading-relaxed font-medium">
-                                    Email konfirmasi akan dikirimkan secara otomatis ke alamat email yang didaftarkan.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -112,13 +110,6 @@
                         Batal
                     </a>
                 </div>
-
-                <div class="text-center px-4">
-                    <p class="text-[10px] text-gray-400 italic">
-                        <i class="fa-solid fa-shield-halved mr-1"></i> Seluruh aktivitas pendaftaran admin baru akan tercatat dalam log audit sistem demi keamanan.
-                    </p>
-                </div>
-
             </div>
         </div>
     </form>

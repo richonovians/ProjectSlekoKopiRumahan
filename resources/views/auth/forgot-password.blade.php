@@ -42,9 +42,10 @@
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12">
             <div class="w-full max-w-md">
                 
-                <div class="lg:hidden text-center mb-8">
-                    <h2 class="font-['Rajdhani'] text-5xl font-bold text-coffee-dark leading-none">sleko</h2>
-                    <p class="tracking-[0.2em] text-[10px] uppercase text-gray-500 font-semibold mt-1">kopi rumahan</p>
+                <div class="lg:hidden flex flex-col items-center text-center mb-8">
+                    <h2 class="font-['Rajdhani'] text-6xl font-bold text-coffee-dark leading-[0.8] tracking-tight">sleko</h2>
+                    
+                    <p class="font-['Rajdhani'] font-medium tracking-[0.4em] text-[10px] text-gray-500 mt-0.5 ml-1 opacity-90">kopi rumahan</p>
                 </div>
 
                 <div class="mb-8 text-center lg:text-left">

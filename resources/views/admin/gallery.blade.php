@@ -109,7 +109,7 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
             <div class="relative h-56 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1445116572660-236099ceec33?auto=format&fit=crop&w=600&q=80" alt="Ambience" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?auto=format&fit=crop&w=600&q=80" alt="Ambience" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                 
                 <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-wider py-1 px-3 rounded-md">
                     Ambience Cafe

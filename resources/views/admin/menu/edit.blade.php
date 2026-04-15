@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Menu Baru')
-@section('page_title', 'Tambah Menu')
+@section('title', 'Edit Menu')
+@section('page_title', 'Edit Menu')
 
 @section('content')
 
@@ -14,8 +14,9 @@
         </a>
     </div>
 
-    <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.menu.update', ['id' => $menu->id_menu]) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         
         <div class="flex flex-col lg:flex-row gap-6">
             
@@ -25,12 +26,12 @@
                     
                     <div class="mb-5">
                         <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Nama Menu <span class="text-red-500">*</span></label>
-                        <input type="text" id="name" name="nama_menu" placeholder="Contoh: Kopi Susu Aren" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                        <input type="text" id="name" name="nama_menu" value="{{ old('nama_menu', $menu->nama_menu) }}" placeholder="Contoh: Kopi Susu Aren" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
                     </div>
 
                     <div class="mb-5">
                         <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Menu <span class="text-red-500">*</span></label>
-                        <textarea id="description" name="deskripsi" rows="4" placeholder="Tuliskan deskripsi menarik tentang menu ini..." class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition resize-none" required></textarea>
+                        <textarea id="description" name="deskripsi" rows="4" placeholder="Tuliskan deskripsi menarik tentang menu ini..." class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition resize-none" required>{{ old('deskripsi', $menu->deskripsi) }}</textarea>
                         <p class="text-[10px] text-gray-400 mt-1.5">Tulis deskripsi singkat dan jelas untuk menarik perhatian pelanggan.</p>
                     </div>
 
@@ -38,9 +39,9 @@
                         <div>
                             <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori <span class="text-red-500">*</span></label>
                             <select id="category" name="jenis" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition bg-white" required>
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                <option value="minuman">Minuman</option>
-                                <option value="makanan">Makanan</option>
+                                <option value="" disabled>Pilih Kategori</option>
+                                <option value="minuman" {{ old('jenis', $menu->jenis) == 'minuman' ? 'selected' : '' }}>Minuman</option>
+                                <option value="makanan" {{ old('jenis', $menu->jenis) == 'makanan' ? 'selected' : '' }}>Makanan</option>
                             </select>
                         </div>
 
@@ -50,7 +51,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="text-gray-500 sm:text-sm font-medium">Rp</span>
                                 </div>
-                                <input type="number" id="price" name="harga" placeholder="0" class="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                                <input type="number" id="price" name="harga" value="{{ old('harga', $menu->harga) }}" placeholder="0" class="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
                             </div>
                         </div>
                     </div>
@@ -65,22 +66,22 @@
                     <div class="w-full">
                         <div id="image-preview-container" class="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-[#f5f7fd] hover:border-coffee-primary transition-colors cursor-pointer relative overflow-hidden group h-56 flex flex-col items-center justify-center text-center px-4" onclick="document.getElementById('image-upload').click()">
                             
-                            <div id="upload-prompt" class="flex flex-col items-center">
+                            <div id="upload-prompt" class="flex flex-col items-center {{ $menu->gambar ? 'hidden' : '' }}">
                                 <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3 text-coffee-primary group-hover:scale-110 transition-transform">
                                     <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                                 </div>
-                                <p class="text-sm font-semibold text-gray-700">Klik untuk upload foto</p>
-                                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, PNG, WEBP</p>
+                                <p class="text-sm font-semibold text-gray-700">Klik untuk ganti foto</p>
+                                <p class="text-[10px] text-gray-400 mt-1">Biarkan kosong jika tidak ingin mengganti foto</p>
                             </div>
 
-                            <img id="image-preview" class="hidden absolute inset-0 w-full h-full object-cover" alt="Preview">
+                            <img id="image-preview" src="{{ $menu->gambar ? asset('storage/' . $menu->gambar) : '' }}" class="absolute inset-0 w-full h-full object-cover {{ $menu->gambar ? '' : 'hidden' }}" alt="Preview">
                             
-                            <div id="image-overlay" class="hidden absolute inset-0 bg-coffee-dark/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div id="image-overlay" class="absolute inset-0 bg-coffee-dark/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 {{ $menu->gambar ? '' : 'hidden' }}">
                                 <span class="text-white text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-pen mr-2"></i>Ganti Foto</span>
                             </div>
                         </div>
                         
-                        <input type="file" id="image-upload" name="gambar" class="hidden" accept="image/jpeg, image/png, image/webp" onchange="initCrop(event)" required>
+                        <input type="file" id="image-upload" name="gambar" class="hidden" accept="image/jpeg, image/png, image/webp" onchange="initCrop(event)">
                     </div>
                 </div>
 
@@ -90,15 +91,15 @@
                     <div class="mb-5">
                         <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">Status Visibilitas</label>
                         <select id="status" name="status" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition bg-white">
-                            <option value="aktif">Aktif (Tampil di Website)</option>
-                            <option value="draft">Draft (Sembunyikan Sementara)</option>
+                            <option value="aktif" {{ old('status', $menu->status) == 'aktif' ? 'selected' : '' }}>Aktif (Tampil di Website)</option>
+                            <option value="draft" {{ old('status', $menu->status) == 'draft' ? 'selected' : '' }}>Draft (Sembunyikan Sementara)</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Menu Unggulan</label>
                         <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                            <input type="checkbox" name="is_featured" value="1" class="w-4 h-4 text-coffee-primary bg-gray-100 border-gray-300 rounded focus:ring-coffee-primary focus:ring-2">
+                            <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $menu->is_featured) ? 'checked' : '' }} class="w-4 h-4 text-coffee-primary bg-gray-100 border-gray-300 rounded focus:ring-coffee-primary focus:ring-2">
                             <span class="ml-3 text-sm text-gray-700 font-medium">Jadikan Menu Unggulan (Featured)</span>
                         </label>
                     </div>
@@ -109,7 +110,7 @@
                         Batal
                     </a>
                     <button type="submit" class="w-2/3 bg-coffee-dark hover:bg-[#005bb5] text-white font-semibold py-3 px-4 rounded-lg shadow-md transition text-center text-sm flex items-center justify-center">
-                        <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Menu
+                        <i class="fa-solid fa-floppy-disk mr-2"></i> Update Menu
                     </button>
                 </div>
 

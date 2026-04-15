@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\Admin\MenuController as AdminMenu;
+use App\Models\Menu;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,9 +14,17 @@ use App\Http\Controllers\AdminController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', fn() => view('home'))->name('home');
+Route::get('/', function () {
+    $featuredMenus = Menu::where('status', 'aktif')
+        ->where('is_featured', 1)
+        ->latest()
+        ->take(4)
+        ->get();
+
+    return view('home', compact('featuredMenus'));
+})->name('home');
 Route::get('/about', fn() => view('about'))->name('about');
-Route::get('/menu', fn() => view('menu'))->name('menu');
+Route::get('/menu', [MenuController::class, 'index'])->name('menu');
 Route::get('/gallery', fn() => view('gallery'))->name('gallery');
 Route::get('/contact', fn() => view('contact'))->name('contact');
 
@@ -29,11 +41,17 @@ Route::middleware(['auth'])
     ->group(function () {
 
         // dashboard
-        Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // menu
-        Route::view('/menu', 'admin.menu')->name('menu');
-        Route::view('/menu/create', 'admin.menu.create')->name('menu.create');
+        // menu (PERBAIKI DI SINI)
+        Route::get('/menu', [AdminMenu::class, 'index'])->name('menu');
+        Route::get('/menu/create', [AdminMenu::class, 'create'])->name('menu.create');
+        Route::post('/menu/store', [AdminMenu::class, 'store'])->name('menu.store');
+
+        Route::get('/menu/{id}/edit', [AdminMenu::class, 'edit'])->name('menu.edit');
+        Route::put('/menu/{id}', [AdminMenu::class, 'update'])->name('menu.update');
+
+        Route::delete('/menu/{id}', [AdminMenu::class, 'destroy'])->name('menu.destroy');
 
         // gallery
         Route::view('/gallery', 'admin.gallery')->name('gallery');
@@ -56,8 +74,14 @@ Route::middleware(['auth', 'role:superadmin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::view('/users', 'admin.users')->name('users');
-        Route::view('/users/create', 'admin.users.create')->name('users.create');
+        Route::get('/users', [UserController::class, 'index'])->name('users');
+        // Menampilkan form tambah admin (DIPERBARUI)
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        
+        // Memproses data dari form tambah admin ke database (DITAMBAHKAN)
+        Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 
