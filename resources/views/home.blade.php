@@ -95,7 +95,7 @@
             <div class="flex-1 flex">
                 <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=300&q=80" alt="Coffee" class="w-1/3 object-cover h-48 md:h-auto border-r border-white/20">
                 <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=300&q=80" alt="Frappe" class="w-1/3 object-cover h-48 md:h-auto border-r border-white/20">
-                <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=300&q=80" alt="Croissant" class="w-1/3 object-cover h-48 md:h-auto">
+                <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Croissant" class="w-1/3 object-cover h-48 md:h-auto">
             </div>
 
             <div class="flex-1 p-8 md:p-10 flex flex-col justify-center bg-coffee-primary text-white">

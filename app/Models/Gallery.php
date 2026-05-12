@@ -19,6 +19,7 @@ class Gallery extends Model
         'nama_gambar',
         'kategori',
         'image_path',
+        'status',
     ];
 
     public function user()

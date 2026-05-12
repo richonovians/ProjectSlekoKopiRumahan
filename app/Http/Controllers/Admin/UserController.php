@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -61,10 +62,68 @@ class UserController extends Controller
             'password' => Hash::make($request->password), // Password wajib di-hash
             'role' => $request->role,
             // Jika checkbox diceklis maka bernilai 1, jika tidak maka 0
-            'status' => $request->has('status') ? 1 : 0, 
+            'status' => $request->has('status') ? 1 : 0,
+            'email_verified_at' => now(),
         ]);
 
         // 3. Redirect kembali dengan pesan sukses
         return redirect()->route('admin.users')->with('success', 'Akun admin berhasil didaftarkan!');
+    }
+
+    public function edit($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = User::findOrFail($id);
+        
+        // Lempar data pengguna ke halaman view edit
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Validasi input
+        $request->validate([
+            'name' => 'required|string|max:50',
+            // Pengecualian pada email, agar tidak error "Email sudah terdaftar" saat mengedit akun sendiri
+            'email' => 'required|string|email|max:30|unique:users,email,' . $user->id, 
+            'telepon' => 'nullable|string|max:15',
+            'role' => 'required|in:admin,superadmin',
+            // Password bersifat opsional saat proses edit
+            'password' => 'nullable|string|min:8|confirmed', 
+        ]);
+
+        // Siapkan data yang akan diupdate
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'telepon' => $request->telepon,
+            'role' => $request->role,
+            'status' => $request->has('status') ? 1 : 0,
+        ];
+
+        // Jika password diisi, enkripsi dan masukkan ke data update
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        // Eksekusi update
+        $user->update($data);
+
+        return redirect()->route('admin.users')->with('success', 'Data admin berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::user()->id == $user->id) {
+            return redirect()->route('admin.users')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        $user->delete(); // Karena SoftDeletes dicopot di Model, ini otomatis menjadi Hard Delete
+
+        return redirect()->route('admin.users')->with('success', 'Akun admin berhasil dihapus permanen.');
     }
 }

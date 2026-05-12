@@ -8,18 +8,43 @@ class MenuController extends Controller
 {
     public function index()
     {
-        // ambil menu minuman (aktif saja)
-        $drinks = \App\Models\Menu::where('status', 'aktif')
-            ->where('jenis', 'minuman')
+        $kopiTubruk = Menu::where('status', 'aktif')
+            ->where('jenis', 'kopi tubruk')
             ->latest()
             ->get();
 
-        // ambil menu makanan (aktif saja)
-        $foods = \App\Models\Menu::where('status', 'aktif')
-            ->where('jenis', 'makanan')
+        $andalanSleko = Menu::where('status', 'aktif')
+            ->where('jenis', 'andalan sleko')
             ->latest()
             ->get();
 
-        return view('menu', compact('drinks', 'foods'));
+        $espresso = Menu::where('status', 'aktif')
+            ->where('jenis', 'basis espresso')
+            ->latest()
+            ->get();
+
+        $seduhManual = Menu::where('status', 'aktif')
+            ->where('jenis', 'seduh manual')
+            ->latest()
+            ->get();
+
+        $nonKopi = Menu::where('status', 'aktif')
+            ->where('jenis', 'bukan kopi')
+            ->latest()
+            ->get();
+
+        $kudapan = Menu::where('status', 'aktif')
+            ->where('jenis', 'kudapan')
+            ->latest()
+            ->get();
+
+        return view('menu', compact(
+            'kopiTubruk',
+            'andalanSleko',
+            'espresso',
+            'seduhManual',
+            'nonKopi',
+            'kudapan'
+        ));
     }
 }

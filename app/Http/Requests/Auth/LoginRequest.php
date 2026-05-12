@@ -42,9 +42,28 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // 1. Siapkan kredensial dengan tambahan syarat status
+        $credentials = [
+            'email' => $this->input('email'),
+            'password' => $this->input('password'),
+            'status' => 1, // KUNCI: Database akan menolak jika statusnya bukan 1
+        ];
+
+        // 2. Coba login
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // 3. Jika gagal, kita cari tahu alasannya untuk pesan error yang lebih spesifik
+            $user = \App\Models\User::where('email', $this->input('email'))->first();
+
+            // Jika user ada tapi statusnya 0
+            if ($user && $user->status == 0) {
+                throw ValidationException::withMessages([
+                    'email' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Superadmin.',
+                ]);
+            }
+
+            // Jika murni salah email atau salah password
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);

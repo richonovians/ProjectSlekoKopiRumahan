@@ -24,12 +24,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return back()->withErrors([
-                'email' => 'Email atau password salah',
-            ])->onlyInput('email');
-        }
+        // Di sinilah pengecekan status = 1 dan password akan dieksekusi!
+        $request->authenticate();
 
+        // Jika sampai ke baris ini, berarti email, password, DAN status valid.
         $request->session()->regenerate();
 
         $user = Auth::user();

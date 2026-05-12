@@ -35,12 +35,17 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
                         <div>
-                            <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori <span class="text-red-500">*</span></label>
+                            <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Jenis <span class="text-red-500">*</span></label>
                             <select id="category" name="jenis" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition bg-white" required>
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                <option value="minuman">Minuman</option>
-                                <option value="makanan">Makanan</option>
+                                <option value="" disabled selected>Pilih Jenis</option>
+                                <option value="kopi tubruk">Kopi Tubruk</option>
+                                <option value="andalan sleko">Andalan Sleko</option>
+                                <option value="basis espresso">Basis Espresso</option>
+                                <option value="seduh manual">Seduh Manual</option>
+                                <option value="bukan kopi">Bukan Kopi</option>
+                                <option value="kudapan">Kudapan</option>
                             </select>
                         </div>
 
@@ -167,11 +172,9 @@
         const cropModalContent = document.getElementById('crop-modal-content');
         const imgPreview = document.getElementById('image-preview');
 
-        // PERBAIKAN: Menyimpan hasil crop terakhir di memori agar tidak hilang saat di-Batal
         let lastCroppedFile = null;
         let lastCroppedUrl = null;
 
-        // Otomatis mengecek foto dari database (Kosong di halaman Tambah, Terisi di halaman Edit)
         const oldImageSrc = "{{ isset($menu) && $menu->gambar ? asset('storage/' . $menu->gambar) : '' }}";
 
         function initCrop(event) {
@@ -223,10 +226,8 @@
                     cropper = null;
                 }
                 
-                // LOGIKA PEMBATALAN YANG DIPERBAIKI
                 if (isCancel) {
                     if (lastCroppedFile) {
-                        // 1. Jika sebelumnya SUDAH PERNAH berhasil crop foto baru, kembalikan ke foto baru tersebut
                         const container = new DataTransfer();
                         container.items.add(lastCroppedFile);
                         imageUpload.files = container.files;
@@ -237,7 +238,6 @@
                         document.getElementById('image-overlay').classList.remove('hidden');
 
                     } else if (oldImageSrc !== '') {
-                        // 2. Jika belum pernah crop, tapi ADA foto dari database (Halaman Edit Menu)
                         imageUpload.value = '';
                         imgPreview.src = oldImageSrc;
                         imgPreview.classList.remove('hidden');
@@ -245,7 +245,6 @@
                         document.getElementById('image-overlay').classList.remove('hidden');
 
                     } else {
-                        // 3. Jika belum pernah crop dan TIDAK ADA foto lama (Halaman Tambah Menu awal)
                         imageUpload.value = '';
                         imgPreview.classList.add('hidden');
                         document.getElementById('upload-prompt').classList.remove('hidden');
@@ -268,25 +267,20 @@
 
             canvas.toBlob(function(blob) {
                 
-                // Bebaskan URL memory lama jika ada, untuk mencegah browser lag (Memory Leak)
                 if (lastCroppedUrl) URL.revokeObjectURL(lastCroppedUrl);
 
-                // Simpan hasil ke "Memori Ingatan"
                 lastCroppedUrl = URL.createObjectURL(blob);
                 lastCroppedFile = new File([blob], "cropped_menu.jpg", { type: "image/jpeg", lastModified: new Date().getTime() });
                 
-                // Tampilkan ke UI Preview
                 imgPreview.src = lastCroppedUrl;
                 imgPreview.classList.remove('hidden');
                 document.getElementById('upload-prompt').classList.add('hidden');
                 document.getElementById('image-overlay').classList.remove('hidden');
 
-                // Masukkan secara rahasia ke input file
                 const container = new DataTransfer();
                 container.items.add(lastCroppedFile);
                 imageUpload.files = container.files; 
 
-                // Tutup modal
                 closeCropModal(false);
                 
             }, 'image/jpeg', 0.85); 

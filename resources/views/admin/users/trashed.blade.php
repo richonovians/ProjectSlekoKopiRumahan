@@ -1,51 +1,51 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola Admin')
-@section('page_title', 'Manajemen Pengguna')
+@section('title', 'Arsip Admin')
+@section('page_title', 'Arsip Pengguna Terhapus')
 
 @section('content')
 
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        
-        <form id="filter-form" action="{{ route('admin.users') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto" onsubmit="event.preventDefault();">
-            
+        {{-- Pencarian & Filter (DIMODIFIKASI UNTUK AJAX) --}}
+        <form id="filter-form" action="{{ route('admin.users.trashed') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto" onsubmit="event.preventDefault();">
             <div class="relative flex items-center">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400 text-sm"></i>
+                <input type="text" id="search-input" name="search" value="{{ request('search') }}" placeholder="Cari di arsip..." 
+                    class="pl-10 pr-10 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary w-full sm:w-64 transition shadow-sm" autocomplete="off">
                 
-                <input type="text" id="search-input" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..." class="pl-10 pr-10 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary w-full sm:w-64 transition shadow-sm" autocomplete="off">
-                
+                {{-- Tombol Silang (Clear Search) --}}
                 <button type="button" id="clear-search" class="absolute right-3 text-gray-400 hover:text-red-500 transition {{ request('search') ? '' : 'hidden' }}" title="Hapus pencarian">
                     <i class="fa-solid fa-circle-xmark"></i>
                 </button>
             </div>
             
-            <select id="role-select" name="role" class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary text-gray-600 bg-white cursor-pointer w-full sm:w-auto shadow-sm">
+            <select id="role-select" name="role" class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary text-gray-600 bg-white cursor-pointer shadow-sm">
                 <option value="">Semua Peran</option>
                 <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
                 <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
             </select>
         </form>
 
-        {{-- PERUBAHAN: Tombol Arsip dihapus --}}
-        <div class="flex gap-2 w-full md:w-auto">
-            <a href="{{ route('admin.users.create') }}" class="w-full md:w-auto bg-coffee-dark hover:bg-[#005bb5] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm flex items-center justify-center">
-                <i class="fa-solid fa-user-plus mr-2"></i> Tambah Admin
-            </a>
-        </div>
+        {{-- Navigasi Kembali --}}
+        <a href="{{ route('admin.users') }}" class="w-full md:w-auto bg-gray-100 hover:bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm flex items-center justify-center border border-gray-200">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Daftar Aktif
+        </a>
     </div>
 
-    {{-- Alert Success / Error --}}
+    {{-- Pesan Notifikasi --}}
     @if(session('success'))
         <div class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm rounded shadow-sm">
             <i class="fa-solid fa-check-circle mr-2"></i> {{ session('success') }}
         </div>
     @endif
+
     @if(session('error'))
         <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded shadow-sm">
             <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ session('error') }}
         </div>
     @endif
 
+    {{-- Tambahan transisi pada table-container --}}
     <div id="table-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-opacity duration-300">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -54,90 +54,69 @@
                         <th class="px-6 py-4 font-semibold w-12 text-center">No</th>
                         <th class="px-6 py-4 font-semibold">Pengguna</th>
                         <th class="px-6 py-4 font-semibold text-center">Peran</th>
-                        <th class="px-6 py-4 font-semibold text-center">Status</th>
-                        <th class="px-6 py-4 font-semibold">Terdaftar Pada</th>
-                        <th class="px-6 py-4 font-semibold text-center">Aksi</th>
+                        <th class="px-6 py-4 font-semibold">Dihapus Pada</th>
+                        <th class="px-6 py-4 font-semibold text-center text-red-500">Aksi Permanen</th>
                     </tr>
                 </thead>
                 
                 <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-                    
                     @forelse($users as $user)
-                    <tr class="hover:bg-gray-50 transition group">
+                    <tr class="hover:bg-red-50/30 transition group">
                         <td class="px-6 py-4 text-gray-500 text-center">
                             {{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}
                         </td>
                         
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&color=fff" alt="{{ $user->name }}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-200">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=E5E7EB&color=9CA3AF" alt="{{ $user->name }}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-200 grayscale">
                                 <div class="ml-3">
-                                    <p class="font-bold text-coffee-dark">{{ $user->name }}</p>
+                                    <p class="font-bold text-gray-500">{{ $user->name }}</p>
                                     <p class="text-[10px] text-gray-400 mt-0.5">{{ $user->email }}</p>
                                 </div>
                             </div>
                         </td>
 
                         <td class="px-6 py-4 text-center">
-                            @if($user->role === 'superadmin')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#023A73]/10 text-[#023A73] uppercase tracking-wider border border-[#023A73]/20">
-                                    <i class="fa-solid fa-crown mr-1.5 text-[#023A73]"></i> Superadmin
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600 uppercase tracking-wider border border-gray-200">
-                                    <i class="fa-solid fa-user mr-1.5 text-gray-500"></i> Admin
-                                </span>
-                            @endif
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            @if($user->status == 1)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-green-600 bg-green-50 border border-green-100">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></span> Aktif
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-red-600 bg-red-50 border border-red-100">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span> Tidak Aktif
-                                </span>
-                            @endif
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-400 border border-gray-200 uppercase tracking-wider">
+                                {{ $user->role }}
+                            </span>
                         </td>
 
                         <td class="px-6 py-4">
-                            <p class="text-xs text-gray-600">{{ $user->created_at->format('d M Y') }}</p>
-                            <p class="text-[10px] text-gray-400">{{ $user->created_at->format('H:i') }} WIB</p>
+                            <p class="text-xs text-gray-500 font-medium">{{ $user->deleted_at->format('d M Y') }}</p>
+                            <p class="text-[10px] text-gray-400 italic">Oleh sistem (Soft Delete)</p>
                         </td>
 
                         <td class="px-6 py-4">
-                            <div class="flex justify-center space-x-2 opacity-70 group-hover:opacity-100 transition">
+                            <div class="flex justify-center space-x-3">
                                 
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-md transition" title="Edit Pengguna">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </a>
+                                {{-- Tombol Restore --}}
+                                <form action="{{ route('admin.users.restore', $user->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="text-green-600 hover:text-green-700 hover:bg-green-100 p-2 rounded-lg transition border border-transparent hover:border-green-200" title="Kembalikan Akun">
+                                        <i class="fa-solid fa-rotate-left"></i> <span class="ml-1 text-[10px] font-bold uppercase">Restore</span>
+                                    </button>
+                                </form>
 
-                                @if(auth()->id() !== $user->id)
-                                    <button type="button" onclick="openDeleteModal('{{ route('admin.users.destroy', $user->id) }}', '{{ addslashes($user->name) }}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-md transition" title="Hapus Admin">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                @else
-                                    <button class="text-gray-300 cursor-not-allowed p-2 rounded-md transition" title="Anda tidak dapat menghapus akun sendiri" disabled>
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                @endif
+                                {{-- Tombol Force Delete (Menggunakan Modal) --}}
+                                <button type="button" onclick="openForceDeleteModal('{{ route('admin.users.force_delete', $user->id) }}', '{{ addslashes($user->name) }}')" class="text-red-500 hover:text-red-700 hover:bg-red-100 p-2 rounded-lg transition border border-transparent hover:border-red-200" title="Hapus Permanen">
+                                    <i class="fa-solid fa-eraser"></i> <span class="ml-1 text-[10px] font-bold uppercase">Hapus</span>
+                                </button>
 
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-12 text-gray-500">
-                            <div class="flex flex-col items-center justify-center">
-                                <i class="fa-solid fa-users text-4xl mb-3 opacity-20"></i>
-                                <p class="text-sm">Data pengguna tidak ditemukan.</p>
+                        <td colspan="5" class="text-center py-12">
+                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                <i class="fa-solid fa-box-archive text-4xl mb-3 opacity-20"></i>
+                                <p class="text-sm">Tidak ada data di dalam arsip tong sampah.</p>
                             </div>
                         </td>
                     </tr>
                     @endforelse
-
                 </tbody>
             </table>
         </div>
@@ -147,25 +126,26 @@
         </div>
     </div>
 
-    {{-- PERUBAHAN: Teks Modal diubah untuk Hapus Permanen --}}
-    <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity">
-        <div id="deleteModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform scale-95 opacity-0 transition-all duration-300 mx-4 border-t-4 border-red-500">
+    {{-- MODAL HTML UNTUK FORCE DELETE --}}
+    <div id="forceDeleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/70 backdrop-blur-sm transition-opacity">
+        <div id="forceDeleteModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform scale-95 opacity-0 transition-all duration-300 mx-4 border-t-4 border-red-600">
             <div class="flex flex-col items-center text-center">
                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                     <i class="fa-solid fa-triangle-exclamation text-3xl text-red-600"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus Permanen?</h3>
-                <p class="text-sm text-gray-500 mb-6">Anda akan menghapus akun <span id="modalUserName" class="font-bold text-gray-800"></span> secara permanen dari database. <br><span class="text-red-500 font-semibold mt-1 block">Tindakan ini tidak bisa dibatalkan!</span></p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus Selamanya?</h3>
+                <p class="text-sm text-gray-500 mb-6">Anda akan memusnahkan akun <span id="modalForceUserName" class="font-bold text-gray-800"></span> dari database. Data terkait mungkin akan terpengaruh. <br><span class="text-red-500 font-semibold mt-1 block">Tindakan ini tidak bisa dibatalkan!</span></p>
                 
                 <div class="flex gap-3 w-full">
-                    <button type="button" onclick="closeDeleteModal()" class="w-1/2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition">
+                    <button type="button" onclick="closeForceDeleteModal()" class="w-1/2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition">
                         Batal
                     </button>
-                    <form id="deleteForm" method="POST" class="w-1/2 m-0">
+                    {{-- Form eksekutor Force Delete --}}
+                    <form id="forceDeleteForm" method="POST" class="w-1/2 m-0">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow-sm transition">
-                            Ya, Hapus
+                            Ya, Musnahkan
                         </button>
                     </form>
                 </div>
@@ -173,12 +153,14 @@
         </div>
     </div>
 
+    {{-- JAVASCRIPT UNTUK KONTROL MODAL & AJAX FILTER --}}
     <script>
-        function openDeleteModal(url, name) {
-            const modal = document.getElementById('deleteModal');
-            const modalContent = document.getElementById('deleteModalContent');
-            const form = document.getElementById('deleteForm');
-            const nameSpan = document.getElementById('modalUserName');
+        // --- SCRIPT UNTUK MODAL HAPUS ---
+        function openForceDeleteModal(url, name) {
+            const modal = document.getElementById('forceDeleteModal');
+            const modalContent = document.getElementById('forceDeleteModalContent');
+            const form = document.getElementById('forceDeleteForm');
+            const nameSpan = document.getElementById('modalForceUserName');
 
             form.action = url;
             nameSpan.textContent = name;
@@ -192,9 +174,9 @@
             }, 10);
         }
 
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            const modalContent = document.getElementById('deleteModalContent');
+        function closeForceDeleteModal() {
+            const modal = document.getElementById('forceDeleteModal');
+            const modalContent = document.getElementById('forceDeleteModalContent');
 
             modalContent.classList.remove('scale-100', 'opacity-100');
             modalContent.classList.add('scale-95', 'opacity-0');
@@ -205,6 +187,7 @@
             }, 300);
         }
 
+        // --- SCRIPT UNTUK AJAX PENCARIAN & FILTER ---
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const roleSelect = document.getElementById('role-select');
@@ -213,6 +196,7 @@
 
             async function fetchNewData(url) {
                 try {
+                    // Beri efek transparan saat loading
                     tableContainer.classList.add('opacity-50', 'pointer-events-none');
 
                     const response = await fetch(url, {
@@ -223,9 +207,11 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
+                    // Ganti isi tabel
                     const newTableContent = doc.getElementById('table-container').innerHTML;
                     tableContainer.innerHTML = newTableContent;
 
+                    // Kembalikan efek tabel
                     tableContainer.classList.remove('opacity-50', 'pointer-events-none');
                     window.history.pushState({}, '', url);
 
@@ -248,13 +234,15 @@
                 if (role) url.searchParams.set('role', role);
                 else url.searchParams.delete('role');
 
-                url.searchParams.delete('page'); 
+                url.searchParams.delete('page'); // Reset ke halaman 1
 
                 fetchNewData(url.toString());
             }
 
+            // Pemicu saat Select Role diganti
             roleSelect.addEventListener('change', triggerUpdate);
 
+            // Pemicu saat mengetik (dengan jeda 500ms)
             let timeout = null;
             searchInput.addEventListener('keyup', function() {
                 if (this.value.length > 0) {
@@ -267,6 +255,7 @@
                 timeout = setTimeout(triggerUpdate, 500); 
             });
 
+            // Pemicu tombol silang hapus pencarian
             if (clearSearchBtn) {
                 clearSearchBtn.addEventListener('click', function() {
                     searchInput.value = '';
@@ -276,6 +265,7 @@
                 });
             }
 
+            // Pemicu navigasi Paginasi secara AJAX
             function attachPaginationListeners() {
                 const paginationLinks = tableContainer.querySelectorAll('nav a');
                 paginationLinks.forEach(link => {

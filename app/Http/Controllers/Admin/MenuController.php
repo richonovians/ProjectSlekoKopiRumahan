@@ -48,8 +48,8 @@ class MenuController extends Controller
         $request->validate([
             'nama_menu' => 'required',
             'deskripsi' => 'required',
-            'jenis' => 'required|in:minuman,makanan',
-            'harga' => 'required|numeric',
+            'jenis' => 'required|in:kopi tubruk,andalan sleko,basis espresso,seduh manual,bukan kopi,kudapan',
+            'harga' => 'required|numeric|min:0',
             'gambar' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|in:aktif,draft',
         ]);
@@ -83,8 +83,8 @@ class MenuController extends Controller
         $request->validate([
             'nama_menu' => 'required',
             'deskripsi' => 'required',
-            'jenis' => 'required|in:minuman,makanan',
-            'harga' => 'required|numeric',
+            'jenis' => 'required|in:kopi tubruk,andalan sleko,basis espresso,seduh manual,bukan kopi,kudapan',
+            'harga' => 'required|numeric|min:0',
             'status' => 'required|in:aktif,draft',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);

@@ -21,8 +21,12 @@
             
             <select id="category-select" name="kategori" class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary text-gray-600 bg-white cursor-pointer w-full sm:w-auto">
                 <option value="">Semua Kategori</option>
-                <option value="minuman" {{ request('kategori') == 'minuman' ? 'selected' : '' }}>Minuman</option>
-                <option value="makanan" {{ request('kategori') == 'makanan' ? 'selected' : '' }}>Makanan</option>
+                <option value="andalan sleko" {{ request('kategori') == 'andalan sleko' ? 'selected' : '' }}>Andalan Sleko</option>
+                <option value="basis espresso" {{ request('kategori') == 'basis espresso' ? 'selected' : '' }}>Basis Espresso</option>
+                <option value="bukan kopi" {{ request('kategori') == 'bukan kopi' ? 'selected' : '' }}>Bukan Kopi</option>
+                <option value="kopi tubruk" {{ request('kategori') == 'kopi tubruk' ? 'selected' : '' }}>Kopi Tubruk</option>
+                <option value="kudapan" {{ request('kategori') == 'kudapan' ? 'selected' : '' }}>Kudapan</option>
+                <option value="seduh manual" {{ request('kategori') == 'seduh manual' ? 'selected' : '' }}>Seduh Manual</option>
             </select>
 
             <select id="featured-select" name="is_featured" class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-coffee-primary focus:ring-1 focus:ring-coffee-primary text-gray-600 bg-white cursor-pointer w-full sm:w-auto">
@@ -36,6 +40,13 @@
             <i class="fa-solid fa-plus mr-2"></i> Tambah Menu
         </a>
     </div>
+
+    {{-- Pesan Notifikasi (Opsional, agar konsisten dengan halaman User) --}}
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm rounded shadow-sm">
+            <i class="fa-solid fa-check-circle mr-2"></i> {{ session('success') }}
+        </div>
+    @endif
 
     <div id="table-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-opacity duration-300">
         <div class="overflow-x-auto">
@@ -101,13 +112,10 @@
                                     <i class="fa-solid fa-pen-to-square text-lg"></i>
                                 </a>
 
-                                <form action="{{ route('admin.menu.destroy', ['id' => $menu->id_menu]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus menu ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-md transition" title="Hapus Menu">
-                                        <i class="fa-solid fa-trash-can text-lg"></i>
-                                    </button>
-                                </form>
+                                {{-- PERUBAHAN: Form diganti menjadi button trigger Modal --}}
+                                <button type="button" onclick="openDeleteModal('{{ route('admin.menu.destroy', ['id' => $menu->id_menu]) }}', '{{ addslashes($menu->nama_menu) }}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-md transition" title="Hapus Menu">
+                                    <i class="fa-solid fa-trash-can text-lg"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -127,11 +135,74 @@
         </div>
     </div>
 
+    {{-- TAMBAHAN: HTML Untuk Custom Pop-Up Modal (Di luar table-container) --}}
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div id="deleteModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform scale-95 opacity-0 transition-all duration-300 mx-4">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-3xl text-red-500"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Hapus Menu?</h3>
+                <p class="text-sm text-gray-500 mb-6">Anda akan menghapus menu <span id="modalMenuName" class="font-bold text-gray-700"></span> secara permanen. Lanjutkan?</p>
+                
+                <div class="flex gap-3 w-full">
+                    <button type="button" onclick="closeDeleteModal()" class="w-1/2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition">
+                        Batal
+                    </button>
+                    {{-- Form ini URL-nya akan diisi otomatis oleh JavaScript --}}
+                    <form id="deleteForm" method="POST" class="w-1/2 m-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-full px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-sm transition">
+                            Ya, Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // --- SCRIPT UNTUK MODAL HAPUS ---
+        function openDeleteModal(url, name) {
+            const modal = document.getElementById('deleteModal');
+            const modalContent = document.getElementById('deleteModalContent');
+            const form = document.getElementById('deleteForm');
+            const nameSpan = document.getElementById('modalMenuName');
+
+            // Masukkan URL dan Nama Menu secara dinamis
+            form.action = url;
+            nameSpan.textContent = name;
+
+            // Tampilkan Modal dengan animasi
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            const modalContent = document.getElementById('deleteModalContent');
+
+            // Tutup Modal dengan animasi
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- SCRIPT UNTUK AJAX PENCARIAN & FILTER ---
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const categorySelect = document.getElementById('category-select');
-            const featuredSelect = document.getElementById('featured-select'); // <-- Variabel baru
+            const featuredSelect = document.getElementById('featured-select'); 
             const tableContainer = document.getElementById('table-container');
             const clearSearchBtn = document.getElementById('clear-search');
 
@@ -163,7 +234,7 @@
             function triggerUpdate() {
                 const search = searchInput.value;
                 const category = categorySelect.value;
-                const featured = featuredSelect.value; // <-- Ambil nilai filter unggulan
+                const featured = featuredSelect.value; 
                 
                 const url = new URL(window.location.href);
                 
@@ -173,7 +244,6 @@
                 if (category) url.searchParams.set('kategori', category);
                 else url.searchParams.delete('kategori');
 
-                // Logika Filter Unggulan
                 if (featured !== '') url.searchParams.set('is_featured', featured);
                 else url.searchParams.delete('is_featured');
 
@@ -182,9 +252,8 @@
                 fetchNewData(url.toString());
             }
 
-            // Event listener untuk memicu pencarian otomatis saat dipilih
             categorySelect.addEventListener('change', triggerUpdate);
-            featuredSelect.addEventListener('change', triggerUpdate); // <-- Trigger baru
+            featuredSelect.addEventListener('change', triggerUpdate); 
 
             let timeout = null;
             searchInput.addEventListener('keyup', function() {

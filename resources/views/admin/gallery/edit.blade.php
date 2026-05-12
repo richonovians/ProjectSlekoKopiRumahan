@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Upload Foto Galeri')
-@section('page_title', 'Upload Foto Baru')
+@section('title', 'Edit Foto Galeri')
+@section('page_title', 'Edit Data Galeri')
 
 @section('content')
 
@@ -11,58 +11,64 @@
         </a>
     </div>
 
-    {{-- ACTION DIISI --}}
-    <form action="{{ route('admin.gallery.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.gallery.update', $gallery->id_galeri) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         
         <div class="flex flex-col lg:flex-row gap-6">
             
             <div class="lg:w-2/3 flex flex-col gap-6">
                 
+                {{-- Box Upload Foto --}}
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-                        <h2 class="text-lg font-bold text-coffee-dark">File Foto <span class="text-red-500">*</span></h2>
+                        <h2 class="text-lg font-bold text-coffee-dark">File Foto</h2>
                         <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Maksimal 2MB</span>
                     </div>
                     
                     <div class="w-full mt-2">
                         <div id="image-preview-container" class="border-2 border-dashed @error('image') border-red-400 bg-red-50 @else border-gray-300 bg-gray-50 @enderror rounded-xl hover:bg-[#f5f7fd] hover:border-coffee-primary transition-colors cursor-pointer relative overflow-hidden group h-80 flex flex-col items-center justify-center text-center px-4" onclick="document.getElementById('image-upload').click()">
                             
-                            <div id="upload-prompt" class="flex flex-col items-center">
+                            {{-- Prompt disembunyikan karena foto sudah ada --}}
+                            <div id="upload-prompt" class="flex flex-col items-center hidden">
                                 <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-coffee-primary group-hover:scale-110 transition-transform">
                                     <i class="fa-solid fa-image text-2xl"></i>
                                 </div>
                                 <p class="text-base font-semibold text-gray-700">Pilih atau letakkan foto di sini</p>
                                 <p class="text-xs text-gray-400 mt-1">Format yang didukung: JPG, JPEG, PNG, WEBP</p>
-                                <p class="text-[10px] text-gray-400 mt-4">Rekomendasi ukuran: Landscape atau Persegi (1:1)</p>
                             </div>
 
-                            <img id="image-preview" class="hidden absolute inset-0 w-full h-full object-cover" alt="Preview Galeri">
+                            {{-- Tampilkan foto lama dari storage --}}
+                            <img id="image-preview" src="{{ asset('storage/' . $gallery->image_path) }}" class="absolute inset-0 w-full h-full object-cover" alt="Preview Galeri">
                             
-                            <div id="image-overlay" class="hidden absolute inset-0 bg-coffee-dark/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <span class="text-white text-sm font-bold uppercase tracking-wider bg-white/20 px-4 py-2 rounded-md"><i class="fa-solid fa-camera-rotate mr-2"></i>Pilih Foto Lain</span>
+                            {{-- Overlay Ganti Foto --}}
+                            <div id="image-overlay" class="absolute inset-0 bg-coffee-dark/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <span class="text-white text-sm font-bold uppercase tracking-wider bg-white/20 px-4 py-2 rounded-md"><i class="fa-solid fa-camera-rotate mr-2"></i>Ganti Foto</span>
                             </div>
                         </div>
                         
-                        <input type="file" id="image-upload" name="image" class="hidden" accept="image/jpeg, image/png, image/webp" onchange="previewImage(event)" required>
+                        {{-- Input file tidak wajib (tidak ada required) --}}
+                        <input type="file" id="image-upload" name="image" class="hidden" accept="image/jpeg, image/png, image/webp" onchange="previewImage(event)">
                         
+                        <p class="text-[10px] text-gray-400 mt-3 italic">*Biarkan kosong jika tidak ingin mengganti foto.</p>
+
                         @error('image')
                             <p class="text-red-500 text-xs mt-2 font-semibold"><i class="fa-solid fa-circle-exclamation mr-1"></i> {{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
+                {{-- Box Detail Caption --}}
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                     <h2 class="text-lg font-bold text-coffee-dark mb-4 border-b border-gray-100 pb-4">Caption Singkat</h2>
                     
                     <div>
                         <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Caption Foto <span class="text-red-500">*</span></label>
-                        <input type="text" id="title" name="title" value="{{ old('title') }}" placeholder="Contoh: Suasana sore yang nyaman di sudut cafe..." class="w-full border @error('title') border-red-300 @else border-gray-200 @enderror rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
+                        {{-- Menampilkan caption dari database --}}
+                        <input type="text" id="title" name="title" value="{{ old('title', $gallery->nama_gambar) }}" placeholder="Contoh: Suasana sore yang nyaman di sudut cafe..." class="w-full border @error('title') border-red-300 @else border-gray-200 @enderror rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition" required>
                         
                         @error('title')
                             <p class="text-red-500 text-xs mt-1.5 font-semibold">{{ $message }}</p>
-                        @else
-                            <p class="text-[10px] text-gray-400 mt-1.5">Caption ini akan ditampilkan di bawah foto saat pengunjung melihat galeri.</p>
                         @enderror
                     </div>
                 </div>
@@ -77,50 +83,55 @@
                     <div class="mb-4">
                         <label for="album" class="block text-sm font-semibold text-gray-700 mb-2">Kategori Album <span class="text-red-500">*</span></label>
                         
-                        {{-- VALUE DISESUAIKAN DENGAN ENUM DATABASE --}}
+                        {{-- Select berdasarkan kategori di database --}}
                         <select id="album" name="album" class="w-full border @error('album') border-red-300 @else border-gray-200 @enderror rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition bg-white" required>
-                            <option value="" disabled {{ old('album') ? '' : 'selected' }}>-- Pilih Album --</option>
-                            <option value="interior" {{ old('album') == 'interior' ? 'selected' : '' }}>Interior Cafe</option>
-                            <option value="drink" {{ old('album') == 'drink' ? 'selected' : '' }}>Minuman (Drink)</option>
-                            <option value="food" {{ old('album') == 'food' ? 'selected' : '' }}>Makanan (Food)</option>
+                            <option value="interior" {{ old('album', $gallery->kategori) == 'interior' ? 'selected' : '' }}>Interior Cafe</option>
+                            <option value="drink" {{ old('album', $gallery->kategori) == 'drink' ? 'selected' : '' }}>Minuman (Drink)</option>
+                            <option value="food" {{ old('album', $gallery->kategori) == 'food' ? 'selected' : '' }}>Makanan (Food)</option>
                         </select>
                         @error('album')
                             <p class="text-red-500 text-xs mt-1.5 font-semibold">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Tanggal dibiarkan sebagai pajangan (karena tidak ada di DB) --}}
+                    {{-- Tanggal Publikasi (Memanggil created_at dari database) --}}
                     <div>
                         <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Publikasi</label>
-                        <input type="date" id="date" name="date" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition text-gray-600">
+                        <input type="date" id="date" name="date" value="{{ old('date', $gallery->created_at ? $gallery->created_at->format('Y-m-d') : '') }}" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-coffee-primary/20 focus:border-coffee-primary outline-none transition text-gray-600">
+                        @error('date')
+                            <p class="text-red-500 text-xs mt-1.5 font-semibold">{{ $message }}</p>
+                        @enderror
+                        <p class="text-[10px] text-gray-400 mt-1.5">Tanggal ini diambil dari data publikasi foto sebelumnya.</p>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     <h2 class="text-lg font-bold text-coffee-dark mb-4 border-b border-gray-100 pb-4">Visibilitas</h2>
                     
-                    {{-- Status dibiarkan sebagai pajangan (karena tidak ada di DB) --}}
+                    {{-- Radio button Dinamis berdasarkan status di database --}}
                     <label class="relative flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition group mb-3">
-                        <input type="radio" name="status" value="aktif" class="w-4 h-4 text-coffee-primary border-gray-300 focus:ring-coffee-primary" checked>
+                        <input type="radio" name="status" value="aktif" class="w-4 h-4 text-coffee-primary border-gray-300 focus:ring-coffee-primary" {{ old('status', $gallery->status) == 'aktif' ? 'checked' : '' }}>
                         <div class="ml-3 flex flex-col">
                             <span class="text-sm font-bold text-gray-800">Publikasikan</span>
+                            <span class="text-[10px] text-gray-500 font-normal">Foto langsung tampil di website.</span>
                         </div>
                     </label>
 
                     <label class="relative flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition group">
-                        <input type="radio" name="status" value="draft" class="w-4 h-4 text-gray-400 border-gray-300 focus:ring-gray-400">
+                        <input type="radio" name="status" value="draft" class="w-4 h-4 text-gray-400 border-gray-300 focus:ring-gray-400" {{ old('status', $gallery->status) == 'draft' ? 'checked' : '' }}>
                         <div class="ml-3 flex flex-col">
                             <span class="text-sm font-bold text-gray-600">Simpan sebagai Draft</span>
+                            <span class="text-[10px] text-gray-500 font-normal">Foto hanya terlihat oleh admin.</span>
                         </div>
                     </label>
                 </div>
 
                 <div class="flex gap-3 mt-2">
-                    <a href="{{ route('admin.gallery') }}" class="w-1/3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition text-center text-sm">
+                    <a href="{{ route('admin.gallery') }}" class="w-1/3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition text-center text-sm flex items-center justify-center">
                         Batal
                     </a>
-                    <button type="submit" class="w-2/3 bg-coffee-dark hover:bg-[#005bb5] text-white font-semibold py-3 px-4 rounded-lg shadow-md transition text-center text-sm flex items-center justify-center">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Upload Foto
+                    <button type="submit" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition text-center text-sm flex items-center justify-center">
+                        <i class="fa-solid fa-save mr-2"></i> Simpan
                     </button>
                 </div>
 
